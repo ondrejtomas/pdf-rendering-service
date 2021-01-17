@@ -1,0 +1,78 @@
+version: "3.5"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: guest
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - service-network
+    # TODO: volumes to persist data
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: stolon
+    ports:
+      - 5432:5432
+    networks:
+      - service-network
+    # TODO: volumes to persist data
+
+  dramatiq:
+    image: pdf-rendering
+    container_name: dramatiq
+    restart: always
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: stolon
+      MESSAGE_QUEUE_HOST: rabbitmq
+      MESSAGE_QUEUE_PASSWORD: guest
+      MESSAGE_QUEUE_PORT: 5672
+      MESSAGE_QUEUE_USERNAME: guest
+    entrypoint: ["dramatiq", "src.core.process"]
+    networks:
+      - service-network
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  pdf-rendering:
+    image: pdf-rendering
+    container_name: pdf-rendering
+    restart: always
+    environment:
+      DATABASE_HOST: postgres
+      DATABASE_PASSWORD: password
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: stolon
+      MESSAGE_QUEUE_HOST: rabbitmq
+      MESSAGE_QUEUE_PASSWORD: guest
+      MESSAGE_QUEUE_PORT: 5672
+      MESSAGE_QUEUE_USERNAME: guest
+      SERVICE_HOST: 0.0.0.0
+      SERVICE_PORT: 8000
+    ports:
+      - 8000:8000
+    networks:
+      - service-network
+    depends_on:
+      - dramatiq
+      - postgres
+      - rabbitmq
+
+networks:
+  service-network:
+# TODO: make all the common values via variables (ports, hosts, usernames, ...)
