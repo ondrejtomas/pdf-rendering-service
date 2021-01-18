@@ -30,6 +30,7 @@ services:
     # TODO: volumes to persist data
 
   dramatiq:
+    build: .
     image: pdf-rendering
     container_name: dramatiq
     restart: always

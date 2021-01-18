@@ -2,6 +2,7 @@
 from base64 import b64decode
 from io import BytesIO
 from logging import getLogger
+from typing import List
 
 # Third Party
 from dramatiq import actor
@@ -38,7 +39,7 @@ def normalize_document(document_id: str, document_name: str, document_content_en
     logger.info(f"({document_id}) Document named '{document_name}' was processed.")
 
 
-def get_document_pages(document_content_encoded: str):
+def get_document_pages(document_content_encoded: str) -> List[bytes]:
     # decode the content of the document
     document_content = b64decode(document_content_encoded)
 
@@ -48,7 +49,7 @@ def get_document_pages(document_content_encoded: str):
     # convert PDF document to PNG images (bytes)
     images_original = (page.getPixmap().getPNGdata() for page in pdf)
 
-    # reduce size of each image to fit the recangle given by max width and height
+    # reduce size of each image to fit the max width and max height
     images_reduced = []
     for image_original in images_original:
         # prepare streams of data

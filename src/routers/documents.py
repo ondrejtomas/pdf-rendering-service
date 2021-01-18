@@ -2,6 +2,7 @@
 from base64 import b64encode
 from io import BytesIO
 from logging import getLogger
+from typing import Dict
 from uuid import uuid4
 
 # Third Party
@@ -20,7 +21,7 @@ router = APIRouter()
 
 
 @router.post("/", tags=["documents"])
-async def upload_document(document: UploadFile = File(...)):
+async def upload_document(document: UploadFile = File(...)) -> Dict[str, str]:
     document_id = str(uuid4())
 
     logger.info(
@@ -49,7 +50,7 @@ async def upload_document(document: UploadFile = File(...)):
 
 
 @router.get("/{document_id}", tags=["documents"])
-async def get_document(document_id: str):
+async def get_document(document_id: str) -> Dict[str, str]:
     # get the document from database
     document = DatabaseHandler().get_document(document_id=document_id)
 
@@ -62,7 +63,7 @@ async def get_document(document_id: str):
 
 
 @router.get("/{document_id}/pages/{page_id}", tags=["documents"])
-async def get_page(document_id: str, page_id: str):
+async def get_page(document_id: str, page_id: str) -> StreamingResponse:
     # get the document first and check its status
     document = await get_document(document_id)
     if document["status"] != DocumentStatus.DONE.value:

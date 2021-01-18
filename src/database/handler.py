@@ -42,7 +42,7 @@ class DatabaseHandler(metaclass=Singleton):
         # TODO: close database connection
         pass
 
-    def get_document(self, document_id: str):
+    def get_document(self, document_id: str) -> Document:
         # create a Session
         session = self.Session()
 
@@ -89,7 +89,7 @@ class DatabaseHandler(metaclass=Singleton):
         session.query(Document).filter(Document.id == document_id).update(patch)
         session.commit()
 
-    def get_page(self, document_id: str, page_id: str):
+    def get_page(self, document_id: str, page_id: str) -> Page:
         # create a Session
         session = self.Session()
 
@@ -98,7 +98,7 @@ class DatabaseHandler(metaclass=Singleton):
 
         return page
 
-    def insert_pages(self, document_id: str, pages_data: List[str]):
+    def insert_pages(self, document_id: str, pages_data: List[bytes]):
         # create a Session
         session = self.Session()
 

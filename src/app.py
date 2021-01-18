@@ -33,7 +33,6 @@ async def startup():
     message_queue_handler = MessageQueueHandler()
 
 
-# Close Kafka connections on shutdown
 @app.on_event("shutdown")
 async def shutdown():
     # close message queue handler
